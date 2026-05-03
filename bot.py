@@ -12,6 +12,7 @@ if not TOKEN:
     raise SystemExit("❌ Переменная BOT_TOKEN не задана. Добавьте её в Railway → Variables.")
 
 API = f"https://api.telegram.org/bot{TOKEN}"
+CHANNEL = "@incidentsm"  # Канал для публикации инцидентов
 
 # ═══════════════════════════════════════════════════════════════════
 # СПРАВОЧНИКИ СЦЕНАРИЕВ
@@ -504,10 +505,27 @@ def _finish(cid, mid=None):
     d   = st["data"]
     is_lead = d.get("_type") == "lead"
     text = build_lead_result(d) if is_lead else build_incident_result(d)
+
+    # Отправляем пользователю
     if mid:
         edit(cid, mid, text)
     else:
         send(cid, text)
+
+    # Публикуем в канал
+    label = "💡 Техническая проблема" if is_lead else "🚨 Инцидент"
+    channel_text = f"{label} зафиксирован\n\n{text}"
+    result = send(CHANNEL, channel_text)
+    if result.get("ok"):
+        send(cid, "✅ Инцидент опубликован в канале: " + CHANNEL)
+    else:
+        err = result.get("description", "неизвестная ошибка")
+        send(cid,
+            f"⚠️ Не удалось опубликовать в канале.\n"
+            f"Убедитесь что бот добавлен в канал как администратор.\n"
+            f"Ошибка: `{err}`"
+        )
+
     states.pop(cid, None)
 
 
