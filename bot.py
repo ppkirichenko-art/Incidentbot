@@ -3,7 +3,7 @@ Telegram-бот классификации инцидентов — Силовы
 Логика: Матрица классификации инцидентов (Слайд 3)
 
 Установка: pip install python-telegram-bot==20.7
-Запуск:    BOT_TOKEN=<ваш_токен> python incident_bot.py
+Запуск:    python bot.py   (токен можно вписать прямо в консоль)
 """
 
 import os
@@ -399,7 +399,15 @@ async def help_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 def main() -> None:
     token = os.environ.get("BOT_TOKEN")
     if not token:
-        raise ValueError("Укажите токен: BOT_TOKEN=<токен> python incident_bot.py")
+        print("=" * 55)
+        print("  🤖 Бот классификации инцидентов — Силовые Машины")
+        print("=" * 55)
+        print("  Переменная BOT_TOKEN не найдена.")
+        print("  Вставьте токен от @BotFather и нажмите Enter:\n")
+        token = input("  Токен >>> ").strip()
+    if not token:
+        print("❌ Токен не введён. Запустите бота снова.")
+        return
 
     app = Application.builder().token(token).build()
 
